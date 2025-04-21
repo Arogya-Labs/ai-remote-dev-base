@@ -1,14 +1,20 @@
 FROM python:3.12-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV POETRY_HOME="/opt/poetry"
+ENV PATH="${POETRY_HOME}/bin:${PATH}"
 
 # --- System Dependencies (stable layer) ---
 RUN apt-get update && apt-get install -y \
     curl openssh-server sudo build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# --- Install Poetry globally (stable) ---
-RUN curl -sSL https://install.python-poetry.org | python3
+
+# --- Install Poetry globally and link to PATH ---
+RUN curl -sSL https://install.python-poetry.org | python3 && \
+    ln -s "${POETRY_HOME}/bin/poetry" /usr/local/bin/poetry
+RUN poetry --version
+
 
 # --- Create user (stable layer) ---
 RUN useradd -ms /bin/bash dev && echo "dev:devpass" | chpasswd && adduser dev sudo
@@ -23,9 +29,7 @@ RUN chmod +x /entrypoint.sh
 
 # --- Copy only dependency files first (triggers poetry install layer only when deps change) ---
 COPY --chown=dev:dev pyproject.toml poetry.lock* ./
-ENV PATH="/opt/poetry/bin:$PATH"
 RUN poetry install --no-root || true  # tolerate missing lock file
-RUN poetry --version
 
 # --- Copy full app (only affects last layer rebuild) ---
 COPY --chown=dev:dev . .
