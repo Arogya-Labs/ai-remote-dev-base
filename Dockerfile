@@ -1,8 +1,6 @@
 FROM python:3.12-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV POETRY_HOME="/opt/poetry"
-ENV PATH="$POETRY_HOME/bin:$PATH"
 
 # --- System Dependencies (stable layer) ---
 RUN apt-get update && apt-get install -y \
@@ -25,6 +23,9 @@ RUN chmod +x /entrypoint.sh
 
 # --- Copy only dependency files first (triggers poetry install layer only when deps change) ---
 COPY --chown=dev:dev pyproject.toml poetry.lock* ./
+ENV POETRY_HOME="/opt/poetry"
+ENV PATH="$POETRY_HOME/bin:$PATH"
+RUN poetry --version
 RUN poetry install --no-root || true  # tolerate missing lock file
 
 # --- Copy full app (only affects last layer rebuild) ---
