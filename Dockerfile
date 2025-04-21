@@ -25,8 +25,8 @@ RUN chmod +x /entrypoint.sh
 COPY --chown=dev:dev pyproject.toml poetry.lock* ./
 ENV POETRY_HOME="/opt/poetry"
 ENV PATH="$POETRY_HOME/bin:$PATH"
-RUN poetry --version
 RUN poetry install --no-root || true  # tolerate missing lock file
+RUN poetry --version
 
 # --- Copy full app (only affects last layer rebuild) ---
 COPY --chown=dev:dev . .
