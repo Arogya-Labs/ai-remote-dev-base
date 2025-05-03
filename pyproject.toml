@@ -1,14 +1,10 @@
-[tool.poetry]
+[project]
 name = "ai-remote-dev-base"
 version = "0.1.0"
-description = ""
-authors = ["Suraj M S"]
+description = "Base template to develop LLM apps on the cloud"
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.12"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+authors = ["Suraj M S"]
+requires-python = ">=3.12"
+dependencies = [
+    "open-webui>=0.6.5",
+]
