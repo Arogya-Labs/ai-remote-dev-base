@@ -1,8 +1,6 @@
 FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV POETRY_HOME="/opt/poetry"
-ENV PATH="${POETRY_HOME}/bin:${PATH}"
 
 # --- System Dependencies (stable layer) ---
 RUN apt-get update && apt-get install -y \
@@ -10,8 +8,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # --- Install uv globally and test it ---
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-RUN cp ~/.cargo/bin/uv /usr/local/bin/uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+cp /root/.local/bin/uv /usr/local/bin/
 RUN uv --version
 
 # --- Install Ollama ---
