@@ -15,6 +15,9 @@ RUN curl -sSL https://install.python-poetry.org | python3 && \
     ln -s "${POETRY_HOME}/bin/poetry" /usr/local/bin/poetry
 RUN poetry --version
 
+# --- Install Ollama ---
+RUN curl -fsSL https://ollama.com/install.sh | sh
+RUN ollama --version
 
 # --- Create user (stable layer) ---
 RUN useradd -ms /bin/bash dev && echo "dev:devpass" | chpasswd && adduser dev sudo
@@ -35,7 +38,7 @@ RUN poetry install --no-root || true  # tolerate missing lock file
 COPY --chown=dev:dev . .
 
 # --- Expose ports and set runtime ---
-EXPOSE 22 3000
+EXPOSE 22 3000 11434
 
 USER root
 # Copy entrypoint and make executable
