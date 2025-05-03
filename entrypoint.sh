@@ -17,3 +17,15 @@ ssh-keygen -A
 
 # Start SSHD
 exec /usr/sbin/sshd -D
+
+# Start ollama in background with logging
+echo "Starting ollama..."
+ollama serve > /var/log/ollama.log 2>&1 &
+
+# Start Open WebUI in the background with logging
+echo "Starting Open WebUI..."
+uv run open-webui serve > /var/log/openwebui.log 2>&1 &
+
+# Optional: Tail logs to keep the container alive and viewable
+echo "All services started. Tailing logs..."
+tail -f /var/log/ollama.log /var/log/openwebui.log
