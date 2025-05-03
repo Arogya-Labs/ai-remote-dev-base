@@ -5,12 +5,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 # --- System Dependencies (stable layer) ---
 RUN apt-get update && apt-get install -y \
     curl ca-certificates openssh-server sudo build-essential \
+    cmake pkg-config libssl-dev libffi-dev libpq-dev \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # --- Install uv globally and test it ---
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
 cp /root/.local/bin/uv /usr/local/bin/
 RUN uv --version
+
+# Step 4: Install a Python version using uv
+RUN uv python install 3.12
 
 # --- Install Ollama ---
 RUN curl -fsSL https://ollama.com/install.sh | sh
