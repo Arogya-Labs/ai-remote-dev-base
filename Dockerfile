@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV POETRY_HOME="/opt/poetry"
@@ -9,7 +9,6 @@ RUN apt-get update && apt-get install -y \
     curl openssh-server sudo build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-
 # --- Install Poetry globally and link to PATH ---
 RUN curl -sSL https://install.python-poetry.org | python3 && \
     ln -s "${POETRY_HOME}/bin/poetry" /usr/local/bin/poetry
@@ -18,6 +17,9 @@ RUN poetry --version
 # --- Install Ollama ---
 RUN curl -fsSL https://ollama.com/install.sh | sh
 RUN ollama --version
+
+# --- Verify GPU Access ---
+RUN nvidia-smi || (echo "GPU not accessible. Ensure NVIDIA drivers and container toolkit are installed. Won't exit build.")
 
 # --- Create user (stable layer) ---
 RUN useradd -ms /bin/bash dev && echo "dev:devpass" | chpasswd && adduser dev sudo
