@@ -9,6 +9,11 @@ RUN apt-get update && apt-get install -y \
     curl ca-certificates openssh-server sudo build-essential \
     && rm -rf /var/lib/apt/lists/*
 
+# --- Install uv globally and test it ---
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+RUN cp ~/.cargo/bin/uv /usr/local/bin/uv
+RUN uv --version
+
 # --- Install Ollama ---
 RUN curl -fsSL https://ollama.com/install.sh | sh
 RUN ollama --version
@@ -25,12 +30,6 @@ RUN mkdir /var/run/sshd && chmod 755 /var/run/sshd
 # --- Create app directory and set workdir ---
 RUN mkdir -p /home/dev/app && chown -R dev:dev /home/dev
 WORKDIR /home/dev/app
-
-# Install uv using official script
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Add uv (installed via cargo) to PATH
-ENV PATH="/home/dev/.cargo/bin:$PATH"
 
 # --- Copy full app (only affects last layer rebuild) ---
 COPY --chown=dev:dev . .
