@@ -6,13 +6,8 @@ ENV PATH="${POETRY_HOME}/bin:${PATH}"
 
 # --- System Dependencies (stable layer) ---
 RUN apt-get update && apt-get install -y \
-    curl openssh-server sudo build-essential \
+    curl ca-certificates openssh-server sudo build-essential \
     && rm -rf /var/lib/apt/lists/*
-
-# --- Install Poetry globally and link to PATH ---
-RUN curl -sSL https://install.python-poetry.org | python3 && \
-    ln -s "${POETRY_HOME}/bin/poetry" /usr/local/bin/poetry
-RUN poetry --version
 
 # --- Install Ollama ---
 RUN curl -fsSL https://ollama.com/install.sh | sh
@@ -28,13 +23,14 @@ RUN useradd -ms /bin/bash dev && echo "dev:devpass" | chpasswd && adduser dev su
 RUN mkdir /var/run/sshd && chmod 755 /var/run/sshd
 
 # --- Create app directory and set workdir ---
+RUN mkdir -p /home/dev/app && chown -R dev:dev /home/dev
 WORKDIR /home/dev/app
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 
-# --- Copy only dependency files first (triggers poetry install layer only when deps change) ---
-COPY --chown=dev:dev pyproject.toml poetry.lock* ./
-RUN poetry install --no-root || true  # tolerate missing lock file
+# Install uv using official script
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Add uv (installed via cargo) to PATH
+ENV PATH="/home/dev/.cargo/bin:$PATH"
 
 # --- Copy full app (only affects last layer rebuild) ---
 COPY --chown=dev:dev . .
