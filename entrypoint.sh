@@ -2,6 +2,7 @@
 set -e
 
 mkdir -p /home/dev/logs
+touch /home/dev/logs/ollama.log /home/dev/logs/openwebui.log
 
 # Start Ollama
 echo "Starting Ollama..."
