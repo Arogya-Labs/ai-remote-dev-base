@@ -41,7 +41,15 @@ COPY --chown=dev:dev . .
 EXPOSE 22 3000 11434
 
 USER root
-# Copy entrypoint and make executable
+COPY ssh_key_setup.sh /ssh_key_setup.sh
+RUN chmod +x /ssh_key_setup.sh
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+# Copy SSH keys and start SSH service
+RUN /ssh_key_setup.sh
+
+# Switch to non-root user for app execution
+USER dev
+WORKDIR /home/dev/app
+# Copy entrypoint and make executable
 ENTRYPOINT ["/entrypoint.sh"]
