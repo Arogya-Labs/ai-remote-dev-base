@@ -42,9 +42,10 @@ EXPOSE 22 3000 11434
 
 USER root
 COPY run.sh /run.sh
-RUN chmod +x /run.sh
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+USER dev
+RUN chmod +x /run.sh
 
 # Copy entrypoint and make executable
 ENTRYPOINT ["/entrypoint.sh"]
