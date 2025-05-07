@@ -41,10 +41,11 @@ COPY --chown=dev:dev . .
 EXPOSE 22 3000 11434
 
 USER root
-COPY run.sh /run.sh
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
 USER dev
+COPY run.sh /run.sh
 RUN chmod +x /run.sh
 
 # Copy entrypoint and make executable
