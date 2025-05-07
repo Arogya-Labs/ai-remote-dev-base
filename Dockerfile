@@ -43,6 +43,8 @@ EXPOSE 22 3000 11434
 USER root
 COPY ssh_key_setup.sh /ssh_key_setup.sh
 RUN chmod +x /ssh_key_setup.sh
+COPY run.sh /run.sh
+RUN chmod +x /run.sh
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 # Copy SSH keys and start SSH service
