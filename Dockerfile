@@ -47,11 +47,6 @@ COPY run.sh /run.sh
 RUN chmod +x /run.sh
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-# Copy SSH keys and start SSH service
-RUN /ssh_key_setup.sh
 
-# Switch to non-root user for app execution
-USER dev
-WORKDIR /home/dev/app
 # Copy entrypoint and make executable
 ENTRYPOINT ["/entrypoint.sh"]
