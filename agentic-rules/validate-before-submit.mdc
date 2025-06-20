@@ -1,0 +1,285 @@
+# Agentic Rule: Validate Before Submit
+
+## Rule ID: `VALIDATE_BEFORE_SUBMIT`
+
+## Context
+This rule was created after coding agents implemented components that appeared complete but failed during actual deployment due to missing dependencies, import errors, and lack of end-to-end validation. The implementations looked correct in isolation but couldn't actually run.
+
+## Core Principle
+**"Code that doesn't run is not code - it's expensive documentation."**
+
+## Mandatory Validation Checklist
+
+Before submitting ANY implementation, coding agents MUST complete this validation:
+
+### ✅ Dependency Verification
+- [ ] **All imports can be resolved** - every `import` statement works
+- [ ] **Dependencies are properly declared** in pyproject.toml/requirements
+- [ ] **Package versions are specified** (not just package names)
+- [ ] **Test import**: Run `python -c "import your_module"` successfully
+
+### ✅ Basic Functionality Test
+- [ ] **Code can be executed** - main entry points work
+- [ ] **Help/version flags work** - `--help`, `--version` don't crash
+- [ ] **Error handling works** - invalid inputs produce helpful messages
+- [ ] **Core functions can be called** - main use cases execute
+
+### ✅ Integration Validation
+- [ ] **External services are accessible** - APIs, databases, LLMs respond
+- [ ] **File operations work** - can read/write expected file formats
+- [ ] **Configuration is valid** - settings files, environment variables load
+- [ ] **System requirements are met** - Python version, OS dependencies
+
+### ✅ Deployment Readiness
+- [ ] **Installation instructions work** - someone else can run your code
+- [ ] **Dependencies install cleanly** - no missing packages
+- [ ] **Minimal viable example runs** - simplest use case succeeds
+- [ ] **Error messages are helpful** - users know what to fix
+
+## Validation Commands Required
+
+### Python Projects
+```bash
+# Dependency validation
+uv sync  # or pip install -r requirements.txt
+python -c "import main_module"
+
+# Basic functionality
+python main_module.py --help
+python main_module.py --version
+
+# Smoke test
+python -c "from main_module import main_function; print('OK')"
+
+# Integration test
+python main_module.py --dry-run  # or minimal test mode
+```
+
+### Component Validation
+```bash
+# Test each major function
+python -c "
+from your_module import load_data, process_data
+data = load_data('test_input')
+result = process_data(data)
+print(f'Success: {len(result)} items processed')
+"
+```
+
+## Common Validation Failures
+
+### 🚫 Import Errors
+- Missing dependencies in package management files
+- Circular imports between modules
+- Incorrect relative/absolute import paths
+- Missing `__init__.py` files
+
+### 🚫 Runtime Errors
+- Hardcoded file paths that don't exist
+- Missing environment variables or configuration
+- Network calls without timeout/error handling
+- Unhandled exceptions on basic operations
+
+### 🚫 Integration Failures
+- External services not available (Ollama, databases)
+- File format mismatches (expecting JSON, getting CSV)
+- Version incompatibilities between dependencies
+- OS-specific code that fails on different platforms
+
+### 🚫 Deployment Issues
+- Missing system dependencies (build tools, libraries)
+- Incorrect Python version requirements
+- Platform-specific dependencies not specified
+- Missing data files or assets
+
+## Forcing Functions
+
+### The "Fresh Environment Test"
+Before submitting, simulate a fresh environment:
+```bash
+# Create new virtual environment
+python -m venv fresh_test
+source fresh_test/bin/activate
+
+# Install only what you specified
+uv sync  # or pip install -r requirements.txt
+
+# Try to run your code
+python your_module.py --help
+```
+
+### The "Colleague Test"
+Ask: *"Could a colleague run this code in 5 minutes with just the README instructions?"*
+- If NO: Fix the gaps
+- If YES: Validation passes
+
+### The "Error Path Test"
+Intentionally trigger errors to verify handling:
+```bash
+# Test with invalid inputs
+python your_module.py --nonexistent-flag
+python your_module.py --invalid-file-path
+
+# Test with missing dependencies
+pip uninstall critical_package
+python your_module.py
+```
+
+## Implementation Guidelines
+
+### Pre-Submit Validation Script
+Create a validation script for each component:
+
+```python
+#!/usr/bin/env python3
+"""Validation script for component"""
+
+def validate_imports():
+    """Test all imports work"""
+    try:
+        import your_module
+        from your_module import main_function, helper_class
+        print("✓ All imports successful")
+        return True
+    except ImportError as e:
+        print(f"✗ Import failed: {e}")
+        return False
+
+def validate_basic_functionality():
+    """Test basic functionality works"""
+    try:
+        from your_module import main_function
+        result = main_function("test_input")
+        print(f"✓ Basic functionality works: {result}")
+        return True
+    except Exception as e:
+        print(f"✗ Basic functionality failed: {e}")
+        return False
+
+def validate_integration():
+    """Test integration points work"""
+    # Test external services, file operations, etc.
+    pass
+
+if __name__ == "__main__":
+    success = all([
+        validate_imports(),
+        validate_basic_functionality(),
+        validate_integration()
+    ])
+    
+    if success:
+        print("🎉 All validations passed!")
+    else:
+        print("💥 Validation failed - fix issues before submitting")
+        exit(1)
+```
+
+### Error Handling Standards
+```python
+# Always include helpful error messages
+try:
+    import required_package
+except ImportError:
+    print("Error: required_package not found.")
+    print("Install with: uv add required_package")
+    print("Or: pip install required_package")
+    exit(1)
+
+# Test external services gracefully
+try:
+    response = requests.get("http://localhost:11434/api/tags", timeout=5)
+except requests.ConnectionError:
+    print("Error: Cannot connect to Ollama server.")
+    print("Start Ollama with: ollama serve")
+    exit(1)
+```
+
+## Success Metrics
+
+This rule is successful when:
+- Submitted code runs immediately after `git clone`
+- All dependencies are properly specified
+- Error messages guide users to solutions
+- Integration points are validated
+- Code works in fresh environments
+
+## Violation Consequences
+
+When this rule is violated:
+- Code appears complete but fails in production
+- Users cannot run the implementation
+- Development time is wasted on debugging deployment
+- Trust in AI-generated code decreases
+- Project timelines are delayed
+
+## Examples
+
+### ❌ Wrong Approach (No Validation)
+```python
+# Agent submits code that looks correct
+import ollama  # but ollama not in dependencies
+import custom_module  # but custom_module doesn't exist
+
+def main():
+    client = ollama.Client()  # fails at runtime
+    return "success"
+
+if __name__ == "__main__":
+    main()
+```
+
+### ✅ Right Approach (Validated)
+```python
+# Agent tests before submitting
+try:
+    import ollama
+except ImportError:
+    print("Install ollama: uv add ollama-python")
+    exit(1)
+
+def main():
+    try:
+        client = ollama.Client()
+        return "success"
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+if __name__ == "__main__":
+    result = main()
+    print(f"Result: {result}")
+
+# Agent runs this validation:
+# python module.py  # ✓ works
+# python -c "import module"  # ✓ works
+```
+
+## Integration with Development Workflow
+
+### Git Pre-Commit Hook
+```bash
+#!/bin/sh
+# .git/hooks/pre-commit
+echo "Running validation before commit..."
+python validate_component.py
+if [ $? -ne 0 ]; then
+    echo "Validation failed - commit aborted"
+    exit 1
+fi
+```
+
+### CI/CD Integration
+```yaml
+# .github/workflows/validate.yml
+- name: Validate Implementation
+  run: |
+    uv sync
+    python validate_component.py
+    python main.py --help
+    python -c "import main; print('Import successful')"
+```
+
+---
+
+**Remember: Code that runs correctly is infinitely more valuable than code that looks perfect but fails. Always validate the full pipeline, not just individual functions.**

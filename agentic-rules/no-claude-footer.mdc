@@ -1,0 +1,44 @@
+# No Claude Footer
+
+Do not include Claude-generated footers in git commits.
+
+## Rule
+
+When creating git commits, do NOT include the following footer:
+
+```
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
+
+## Implementation
+
+- Write clean, professional commit messages without AI attribution
+- Focus on the actual changes and their purpose
+- Follow conventional commit format when applicable
+- Keep commits concise and descriptive
+
+## Examples
+
+**Good:**
+```
+feat: add user authentication system
+
+- Implement JWT-based authentication
+- Add login/logout endpoints
+- Include password hashing with bcrypt
+```
+
+**Bad:**
+```
+feat: add user authentication system
+
+- Implement JWT-based authentication
+- Add login/logout endpoints
+- Include password hashing with bcrypt
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
