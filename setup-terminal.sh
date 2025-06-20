@@ -26,10 +26,36 @@ else
     echo "✅ fzf already installed"
 fi
 
-# Install oh-my-bash
+# Install oh-my-bash (preserving existing .bashrc)
 if [ ! -d "$HOME/.oh-my-bash" ]; then
     echo "🎨 Installing oh-my-bash..."
-    bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
+    
+    # Backup existing .bashrc before oh-my-bash installation
+    if [ -f "$HOME/.bashrc" ]; then
+        echo "💾 Backing up existing .bashrc..."
+        cp "$HOME/.bashrc" "$HOME/.bashrc.pre-omb.$(date +%Y%m%d_%H%M%S)"
+    fi
+    
+    # Install oh-my-bash with --unattended flag to prevent automatic .bashrc replacement
+    bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)" "" --unattended
+    
+    # Restore original .bashrc and manually integrate oh-my-bash
+    BACKUP_FILE=$(ls -t "$HOME/.bashrc.pre-omb."* 2>/dev/null | head -1)
+    if [ -f "$BACKUP_FILE" ]; then
+        echo "🔄 Restoring original .bashrc and integrating oh-my-bash..."
+        mv "$BACKUP_FILE" "$HOME/.bashrc"
+        
+        # Add oh-my-bash initialization to existing .bashrc
+        if ! grep -q "source.*oh-my-bash.sh" "$HOME/.bashrc"; then
+            cat >> "$HOME/.bashrc" << 'EOF'
+
+# Initialize oh-my-bash
+export OSH="$HOME/.oh-my-bash"
+export OSH_THEME="agnoster"
+source "$OSH/oh-my-bash.sh"
+EOF
+        fi
+    fi
 else
     echo "✅ oh-my-bash already installed"
 fi
