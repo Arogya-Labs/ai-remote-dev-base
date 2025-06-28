@@ -40,11 +40,10 @@ COPY --chown=dev:dev . .
 # --- Expose ports and set runtime ---
 EXPOSE 22 3000 11434
 
-USER dev
-COPY run.sh /run.sh
-RUN chmod +x /run.sh
-
 USER root
+COPY run.sh /home/dev/run.sh
+RUN chmod +x /home/dev/run.sh && chown dev:dev /home/dev/run.sh
+
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

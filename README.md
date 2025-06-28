@@ -4,8 +4,31 @@ This repository sets up a barebones Docker container with Ollama and Open-WebUI 
 * Installs following packages at docker setup:
   * [uv](https://github.com/astral-sh/uv)
   * [ollama](https://ollama.com/)
-* Then start the default services with `/home/dev/app/run.sh`
-  * this will install [open-webui](https://github.com/open-webui/open-webui) via uv and start ollama and open-webui at their default ports
+* Start services selectively with `/home/dev/app/run.sh`
+  * Use command line arguments to start only the services you need
+  * Installs [open-webui](https://github.com/open-webui/open-webui) via uv when requested
+
+## Usage
+
+Start services using command line arguments:
+
+```bash
+# Start only Ollama
+./run.sh --ollama
+
+# Start only Open WebUI
+./run.sh --openwebui
+
+# Start both services
+./run.sh --ollama --openwebui
+
+# Show help and usage information
+./run.sh --help
+```
+
+**Default Ports:**
+- Ollama: `11434`
+- Open WebUI: `8080`
 
 
 
