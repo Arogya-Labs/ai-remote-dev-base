@@ -40,13 +40,13 @@ COPY --chown=dev:dev . .
 # --- Expose ports and set runtime ---
 EXPOSE 22 3000 11434
 
-USER root
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
 USER dev
 COPY run.sh /run.sh
 RUN chmod +x /run.sh
+
+USER root
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Copy entrypoint and make executable
 ENTRYPOINT ["/entrypoint.sh"]
