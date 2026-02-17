@@ -38,7 +38,7 @@ WORKDIR /home/dev/app
 COPY --chown=dev:dev . .
 
 # --- Expose ports and set runtime ---
-EXPOSE 22 3000 11434
+EXPOSE 22 8080 11434 7000
 
 USER root
 COPY run.sh /home/dev/run.sh
