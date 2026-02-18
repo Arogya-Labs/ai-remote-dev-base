@@ -13,15 +13,20 @@ chsh -s $(which zsh)
 ```
   
  Install helix
-````
+
+```
 sudo add-apt-repository ppa:maveonair/helix-editor
 sudo apt update
 sudo apt install helix
 ```
   
-
 Install Zellij
 ```
 curl https://sh.rustup.rs -sSf | sh
 cargo install --locked zellij
+```
+Optionals
+* glow for tui markdown renderer
+```
+ snap install glow
 ```
