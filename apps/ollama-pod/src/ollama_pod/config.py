@@ -1,8 +1,11 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load from ~/.ollama-pod/.env first, then fall back to cwd/.env
+load_dotenv(Path.home() / ".ollama-pod" / ".env")
+load_dotenv()  # cwd/.env — won't overwrite keys already set
 
 
 def _require(var: str) -> str:
