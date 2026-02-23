@@ -279,6 +279,8 @@ def _print_pod_table(runpod_mod, state: dict) -> None:  # noqa: ANN001
     pod_name = state.get("name", "?")
     try:
         pod = runpod_mod.get_pod(state["pod_id"])
+        if pod is None:
+            raise LookupError
     except Exception:
         console.print(f"[yellow]Pod '{pod_name}' ({state['pod_id']}) not found on RunPod. Cleaning up.[/yellow]")
         _clear_state(pod_name)
